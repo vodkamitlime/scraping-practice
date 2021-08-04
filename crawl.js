@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const iconv = require('iconv-lite');
 
 const getHTML = async (option) => {
     try {
@@ -14,4 +15,27 @@ const getHTML = async (option) => {
     }
 }
 
-getHTML('javascript');
+// // https://search.naver.com/search.naver?where=news&query=javascript&sort=1 // 최신순으로 검색 
+// getHTML('javascript');
+
+const getSecurity = async () => {
+    try {
+        let CRAWL_URL = `https://www.boannews.com/media/t_list.asp`
+        const html = await axios.get(CRAWL_URL, {
+            responseEncoding: 'binary'
+        });
+        const htmlData = iconv.decode(html.data, 'euc-kr').toString();
+        const $ = cheerio.load(htmlData);
+        console.log($)
+        // const article = $('.news_txt');
+        const article = $('.news_content').text();
+        // for (let ar of article) {
+        //     console.log(ar.text())
+        // }
+        console.log(article)
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+getSecurity();
