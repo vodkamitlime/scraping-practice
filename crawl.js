@@ -38,4 +38,34 @@ const getSecurity = async () => {
     }
 }
 
-getSecurity();
+// getSecurity();
+
+const getCoding = async () => {
+    try {
+        let CRAWL_URL = `https://www.codingworldnews.com/news/articleList.html?sc_section_code=S1N2&view_type=sm`
+        const html = await axios.get(CRAWL_URL);
+        const $ = cheerio.load(html.data);
+        const article = $('.titles > a');
+        const title = $(article).text();
+        console.log(title)
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+// getCoding();
+
+const getIT = async () => {
+    try {
+        let CRAWL_URL = `https://www.itworld.co.kr/t/34/%ED%81%B4%EB%9D%BC%EC%9A%B0%EB%93%9C`
+        const html = await axios.get(CRAWL_URL);
+        const $ = cheerio.load(html.data);
+        const article = $('.news_list_title > a')[0];
+        const title = $(article).text();
+        console.log(title)
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+getIT();
