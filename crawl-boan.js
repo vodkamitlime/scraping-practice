@@ -3,6 +3,15 @@ const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
 iconv.skipDecodeWarning = true
 
+const parseDate = (date) => { // 입력 형식: 2021년 08월 10일 12:23
+    const year = date.substring(0, 4);
+    const month = date.substring(6, 8);
+    const day = date.substring(10, 12);
+    const hour = date.substring(14, 16);
+    const minute = date.substring(17, 19);
+    return new Date(year, month-1, day, hour, minute); // 기사 게시일자
+}
+
 const getSecurity = async () => {
 
     let articles = [];
@@ -14,22 +23,34 @@ const getSecurity = async () => {
     const htmlData = iconv.decode(html.data, 'euc-kr').toString();
     const $ = cheerio.load(htmlData);
 
-    for (let i=0; i<=5; i++){
+    for (let i=0; i<=7; i++){
         const article = $('.news_list')[i]
         const url = $(article).find('a').attr('href')
         const title = $(article).find('.news_txt').text();
         const content = $(article).find('.news_content').text();
-        const date = $(article).find('.news_writer').text();
+        let date = $(article).find('.news_writer').text();
+        date = parseDate(date.split('| ')[1]); // Date 객체로 변환
+
+        if (Date.now() - date > 86400000) { // 1일 이상 차이날 경우, skip
+            continue;
+        }
+
+        date.setHours(date.getHours() + 9); // 한국 시간으로 변환
+
         let DATA = {
             "article_title": title,
             "article_content": content,
-            "article_date": date.split('| ')[1],
+            "article_date": date,
             "article_url": 'https://www.boannews.com/' + url, 
-            "article_keyword": "보안"
+            "article_keyword": "보안",
+            "article_publisher": "보안뉴스"
         }
         articles.push(DATA); 
+
     }
+
     return articles;
+
 }
 
 getSecurity().then(data => console.log(data))
