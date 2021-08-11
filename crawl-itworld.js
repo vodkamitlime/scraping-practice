@@ -10,21 +10,20 @@ const getIT = async (url) => {
     let articles = [];
     const html = await axios.get(url);
     const $ = cheerio.load(html.data);
-    
-    for (let i=0; i<1; i++){
-        const titleTag = $('#m_topic_news_list_title')[i];
-        const url = $(titleTag).find('a').attr('href');
-        const title = $(titleTag).find('a').text();
-        const content = $($('#m_topic_news_list_summary')[i]).text().trim();
-        let keyword = $($('#m_topic_news_list_source')[i]).text();
-        let date = $('#m_topic_news_list_time')[i].children[1].data;
-        
-        if (date.includes('시')) {
-            date = date.replace('시 ', ':').replace('분', '');
-            let curTime = new Date(Date.now());
-            curTime.setHours(curTime.getHours() + 9); // 한국 표준시간으로 변환
-            curTime.setTime(date+':00')
-            console.log(curTime)
+    const articleList = $('.body_left').children()[1];
+
+    for (let i=0; i<$(articleList).children().length; i++){
+        const curArticle = $(articleList).children()[i];
+        const url = $(curArticle).find('a').attr('href');
+        const title = $(curArticle).find('.news_list_title').text().trim();
+        const content = $(curArticle).find('.news_body_summary').text().trim().replace(/\n/g, '');
+        let keyword = $(curArticle).find('.news_list_source').text().trim();
+        let date = $(curArticle).find('.news_list_time').text();
+
+        if (date.includes('1일')) {
+            date = new Date(Date.now());
+            date.setHours(date.getHours() + 9); // 한국 표준시간으로 변환
+            date.setDate(date.getDate() - 1);
         } else {
             continue;
         }
@@ -39,49 +38,22 @@ const getIT = async (url) => {
             continue;
         }
 
-    }
-
-}
-// https://www.itworld.co.kr/
-getIT(personalComputingURL);
-
-const getCoding = async (url) => {
-    
-    const articleList = $('.type2')
-    
-    for (let i=0; i<articleList.children().length; i++){
-        const article = articleList.children()[i]
-        const url = $(article).find('a').attr('href')
-        const title = $(article).find('.titles').text();
-        const content = $(article).find('.lead').text().trim();
-        const spanData = $(article).find('.byline');
-        const keyword = $(spanData).find('em')[0].children[0].data;
-        let date = $(spanData).find('em')[2].children[0].data;
-        date = new Date(date)
-
-        if (Date.now() - date > 86400000) { // 1일 이상 차이날 경우, skip
-            continue;
-        }
-        
-        if (!articleKeywords[keyword]){ // 지정된 키워드가 아닐 경우, skip 
-            continue;
-        }
-        
-        date.setHours(date.getHours() + 9); // 한국 시간으로 변환
-
         let DATA = {
             "article_title": title,
             "article_content": content,
             "article_date": date,
-            "article_url": 'https://www.codingworldnews.com' + url, 
-            "article_keyword": articleKeywords[keyword],
-            "article_publisher": "Coding World News"
+            "article_url": 'https://www.itworld.co.kr/' + url, 
+            "article_keyword": keyword,
+            "article_publisher": "It World Korea"
         }
         articles.push(DATA); 
+
     }
 
     return articles;
 
 }
 
-
+getIT(cloudURL).then(data => console.log(data));
+getIT(personalComputingURL).then(data => console.log(data));
+getIT(bigDataURL).then(data => console.log(data));
