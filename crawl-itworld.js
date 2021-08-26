@@ -13,6 +13,7 @@ const getIT = async (url) => {
     const articleList = $('.body_left').children()[1];
 
     for (let i=0; i<$(articleList).children().length; i++){
+
         const curArticle = $(articleList).children()[i];
         const url = $(curArticle).find('a').attr('href');
         const title = $(curArticle).find('.news_list_title').text().trim();
@@ -38,7 +39,7 @@ const getIT = async (url) => {
             continue;
         }
 
-        let DATA = {
+        let data = {
             "article_title": title,
             "article_content": content,
             "article_date": date,
@@ -46,7 +47,7 @@ const getIT = async (url) => {
             "article_keyword": keyword,
             "article_publisher": "It World Korea"
         }
-        articles.push(DATA); 
+        articles.push(data); 
 
     }
 

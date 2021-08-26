@@ -24,6 +24,7 @@ const getSecurity = async () => {
     const $ = cheerio.load(htmlData);
 
     for (let i=0; i<=7; i++){
+        
         const article = $('.news_list')[i]
         const url = $(article).find('a').attr('href')
         const title = $(article).find('.news_txt').text();
@@ -37,7 +38,7 @@ const getSecurity = async () => {
 
         date.setHours(date.getHours() + 9); // 한국 시간으로 변환
 
-        let DATA = {
+        let data = {
             "article_title": title,
             "article_content": content,
             "article_date": date,
@@ -45,7 +46,7 @@ const getSecurity = async () => {
             "article_keyword": "보안",
             "article_publisher": "보안뉴스"
         }
-        articles.push(DATA); 
+        articles.push(data); 
 
     }
 
